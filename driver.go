@@ -42,7 +42,6 @@ func (d *driver) OpenConnection(ip, port string) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
 	//сохраняю соединение в драйвере
 	d.conn = conn
 	return nil
