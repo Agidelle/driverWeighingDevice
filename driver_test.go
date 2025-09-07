@@ -16,14 +16,13 @@ func TestCrc16alg(t *testing.T) {
 }
 
 func TestParsingWeight(t *testing.T) {
-	// пример буфера: 4 байта веса, 1 деление, 1 стабильность, 1 нетто, 1 ноль, 4 байта тары
 	buf := []byte{
-		0x15, 0xCD, 0x5B, 0x07, // вес: 123456789
-		0x02,                   // деление
-		0x01,                   // стабильность
-		0x01,                   // нетто
-		0x00,                   // ноль
-		0x04, 0x03, 0x02, 0x01, // тара: 0xDDCCBBAA
+		0x15, 0xCD, 0x5B, 0x07,
+		0x02,
+		0x01,
+		0x01,
+		0x00,
+		0x04, 0x03, 0x02, 0x01,
 	}
 	length := 12
 
@@ -53,7 +52,6 @@ func TestParsingWeight(t *testing.T) {
 }
 
 func TestParsingScalePar(t *testing.T) {
-	// 8 параметров, каждый заканчивается 0x0D 0x0A
 	buf := append(
 		append([]byte("PMaxValue\x0D\x0A"), []byte("PMinValue\x0D\x0A")...),
 		append(
