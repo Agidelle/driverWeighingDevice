@@ -16,6 +16,8 @@ const (
 	//коды успешного выполнения команд
 	successfulMassa = 0x24
 	successfulScale = 0x76
+	maxByteWeight   = 20
+	maxByteScalePar = 104
 )
 
 // Driver Интерфейс для инкапсуляции драйвера
@@ -60,7 +62,7 @@ func (d *driver) CloseConnection() error {
 // универсальная функция для отправки команд и чтения ответов
 // не экспортируется, нужна для внутреннего использования
 // возвращает буфер с ответом, количество прочитанных байт и ошибку
-func (d *driver) readWrite(cmd []byte) ([]byte, int, error) {
+func (d *driver) readWrite(cmd []byte, l int) ([]byte, int, error) {
 	//проверка, что соединение открыто
 	if d.conn == nil {
 		return nil, 0, fmt.Errorf("соединения не существует")
@@ -86,7 +88,7 @@ func (d *driver) readWrite(cmd []byte) ([]byte, int, error) {
 	}
 	//чтение ответа, согласно спецификации ответ содержит 8-20 байт
 	//использование ReadFull не подходит, т.к. неизвестно сколько байт будет в ответе
-	buf := make([]byte, 20)
+	buf := make([]byte, l)
 	lastByte, err := d.conn.Read(buf)
 	if err != nil {
 		return nil, 0, err
@@ -101,8 +103,8 @@ func (d *driver) readWrite(cmd []byte) ([]byte, int, error) {
 
 // ReadWeight - получение текущих параметров устройства
 func (d *driver) ReadWeight() (*MassaInput, error) {
-	//проверка, что соединение открыто
-	buf, lastByte, err := d.readWrite(buildGetMassa())
+	//проверка, что соединение открыто, максимальная длина по спецификации 20 байт
+	buf, lastByte, err := d.readWrite(buildGetMassa(), maxByteWeight)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +164,7 @@ func parsingWeight(buf []byte, length int) (input *MassaInput, err error) {
 
 // ReadScaleParameters - получение базовых параметров устройства
 func (d *driver) ReadScaleParameters() (*ScaleParameters, error) {
-	buf, lastByte, err := d.readWrite(buildGetScalePar())
+	buf, lastByte, err := d.readWrite(buildGetScalePar(), maxByteScalePar)
 	if err != nil {
 		return nil, err
 	}
